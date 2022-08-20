@@ -21,13 +21,23 @@ async function routes(fastify, options) {
     console.log("Test job handler executed!");
     const data = job.attrs.data;
     // This should be persisted in the database
-    return { data: "Hello world!", date: Date.now(), post_data: data };
+    return { data: "Hello world!", date: Date.now() };
   });
 
-  // TODO: graceful shutdown on SIGTERM etc https://github.com/agenda/agenda/issues/749
-
   await agenda.start();
-  console.log("agenda.start returned!");
+  console.log("agenda started!");
+
+  const gracefulExit = async () => {
+    try {
+      await agenda.stop();
+    } catch (err) {
+      throw new Error(`Error stopping agenda: ${err}`);
+    }
+  };
+
+  // watch for graceful shutdowns so that currently running / grabbed jobs are abandoned and can be re-grabbed later again.
+  process.on("SIGTERM", gracefulExit);
+  process.on("SIGINT", gracefulExit);
 
   // Reference: https://github.com/fastify/fastify-mongodb
   fastify.register(require("@fastify/mongodb"), {
