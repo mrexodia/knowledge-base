@@ -1,6 +1,6 @@
 import fp from "fastify-plugin";
 import { mongoDbUrl } from "../config";
-import { Agenda } from "agenda";
+import { Agenda, Job } from "agenda";
 
 // Add the agenda decorator to the type
 declare module "fastify" {
@@ -18,12 +18,21 @@ export default fp(async (fastify, options) => {
     defaultConcurrency: 5, // Duplicates of a single job running at a specific moment
   });
 
-  agenda.define("test", { shouldSaveResult: true }, async (job: any) => {
-    console.log("Test job handler executed!");
+  // TODO: probably better to automatically define these from the jobs/ folder
+  agenda.define("test", { shouldSaveResult: true }, async (job: Job) => {
+    console.log("test job handler executed!");
     const data = job.attrs.data;
     void data;
     // This should be persisted in the database
     return { data: "Hello world!", date: Date.now() };
+  });
+
+  agenda.define("scrape-url", { shouldSaveResult: true }, async (job: any) => {
+    console.log("scrape-url job handler executed!");
+    const { url } = job.attrs.data;
+    void url;
+    // blah
+    return { data: "oh nein" };
   });
 
   await agenda.start();
