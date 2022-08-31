@@ -1,6 +1,6 @@
 import fp from "fastify-plugin";
 import { mongoDbUrl } from "../config";
-import { Agenda, Job } from "agenda";
+import { Agenda, Job } from "@hokify/agenda";
 
 // Add the agenda decorator to the type
 declare module "fastify" {
@@ -8,6 +8,10 @@ declare module "fastify" {
     agenda: Agenda;
   }
 }
+
+type ScrapeOptions = {
+  url: string;
+};
 
 export default fp(async (fastify, options) => {
   // Reference: https://github.com/agenda/agenda#example-usage
@@ -18,21 +22,21 @@ export default fp(async (fastify, options) => {
     defaultConcurrency: 5, // Duplicates of a single job running at a specific moment
   });
 
+  // TODO: save the results to the database: https://github.com/hokify/agenda/issues/29
+
   // TODO: probably better to automatically define these from the jobs/ folder
-  agenda.define("test", { shouldSaveResult: true }, async (job: Job) => {
+  agenda.define("test", async (job: Job<any>) => {
     console.log("test job handler executed!");
     const data = job.attrs.data;
-    void data;
-    // This should be persisted in the database
-    return { data: "Hello world!", date: Date.now() };
+    const jobId = job.attrs._id;
+    console.log(`id: ${jobId}, data: ${data}`);
   });
 
-  agenda.define("scrape-url", { shouldSaveResult: true }, async (job: any) => {
+  agenda.define("scrape-url", async (job: Job<ScrapeOptions>) => {
     console.log("scrape-url job handler executed!");
     const { url } = job.attrs.data;
-    void url;
-    // blah
-    return { data: "oh nein" };
+    const jobId = job.attrs._id;
+    console.log(`TODO: scrape ${url} (job id: ${jobId})`)
   });
 
   await agenda.start();
