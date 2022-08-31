@@ -22,12 +22,18 @@
     "@fastify/mongodb": "^6.0.1",
     "@fastify/sensible": "^5.0.0",
     "@hokify/agenda": "^6.2.12",
+    "@mozilla/readability": "^0.4.2",
+    "axios": "^0.27.2",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.1.0",
-    "fastify-plugin": "^4.0.0"
+    "fastify-plugin": "^4.0.0",
+    "jsdom": "^20.0.0",
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {
+    "@types/jsdom": "^20.0.0",
     "@types/node": "^18.0.0",
+    "@types/node-fetch": "^2.6.2",
     "@types/tap": "^15.0.5",
     "concurrently": "^7.0.0",
     "fastify-tsconfig": "^1.0.1",

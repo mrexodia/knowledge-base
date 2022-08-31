@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import { mongoDbUrl } from "../config";
 import { Agenda, Job } from "@hokify/agenda";
+import { scrapeUrl } from "../utils/scraper";
 
 // Add the agenda decorator to the type
 declare module "fastify" {
@@ -36,7 +37,14 @@ export default fp(async (fastify, options) => {
     console.log("scrape-url job handler executed!");
     const { url } = job.attrs.data;
     const jobId = job.attrs._id;
-    console.log(`TODO: scrape ${url} (job id: ${jobId})`)
+    try {
+      const article = await scrapeUrl(url);
+      console.log(article.textContent);
+    } catch (err) {
+      console.error(`Error scraping ${url}: ${err}`);
+      // TODO: put failure in the job collection?
+    }
+    console.log(`TODO: scrape ${url} (job id: ${jobId})`);
   });
 
   await agenda.start();
