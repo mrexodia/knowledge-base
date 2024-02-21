@@ -14,8 +14,9 @@ db = SQLAlchemy(app, model_class=Base)
 migrate = Migrate(app, db)
 
 # Make sure the database has been migrated
-with app.app_context():
-    check_revision(db.engine, migrate.get_config())
+if not migrate.command:
+    with app.app_context():
+        check_revision(db.engine, migrate.get_config())
 
 @app.errorhandler(AssertionError)
 def handle_assertion(e: AssertionError):
